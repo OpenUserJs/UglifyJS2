@@ -1,20 +1,29 @@
 do_screw: {
-    options = { screw_ie8: true };
+    options = {
+        screw_ie8: true,
+    }
     beautify = {
         screw_ie8: true,
-        ascii_only: true
-    };
-
-    input: f("\v");
-    expect_exact: 'f("\\v");';
+        ascii_only: true,
+    }
+    input: {
+        f("\v");
+    }
+    expect_exact: 'f("\\v");'
 }
 
 dont_screw: {
-    options = { screw_ie8: false };
-    beautify = { screw_ie8: false, ascii_only: true };
-
-    input: f("\v");
-    expect_exact: 'f("\\x0B");';
+    options = {
+        screw_ie8: false,
+    }
+    beautify = {
+        screw_ie8: false,
+        ascii_only: true,
+    }
+    input: {
+        f("\v");
+    }
+    expect_exact: 'f("\\x0B");'
 }
 
 do_screw_constants: {
@@ -119,6 +128,7 @@ do_screw_try_catch_undefined: {
             return void 0===o
         }
     }
+    expect_stdout: true
 }
 
 dont_screw_try_catch_undefined: {
@@ -147,6 +157,7 @@ dont_screw_try_catch_undefined: {
             return n === undefined
         }
     }
+    expect_stdout: true
 }
 
 reduce_vars: {
@@ -181,4 +192,42 @@ reduce_vars: {
             alert(t);
         }
     }
+}
+
+issue_1586_1: {
+    options = {
+        screw_ie8: false,
+    }
+    mangle = {
+        screw_ie8: false,
+    }
+    input: {
+        function f() {
+            try {
+            } catch (err) {
+                console.log(err.message);
+            }
+        }
+    }
+    expect_exact: "function f(){try{}catch(c){console.log(c.message)}}"
+    expect_stdout: true
+}
+
+issue_1586_2: {
+    options = {
+        screw_ie8: true,
+    }
+    mangle = {
+        screw_ie8: true,
+    }
+    input: {
+        function f() {
+            try {
+            } catch (err) {
+                console.log(err.message);
+            }
+        }
+    }
+    expect_exact: "function f(){try{}catch(c){console.log(c.message)}}"
+    expect_stdout: true
 }

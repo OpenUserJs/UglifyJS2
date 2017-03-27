@@ -166,6 +166,7 @@ keep_collapse_const_in_own_block_scope: {
             console.log(i);
         console.log(c);
     }
+    expect_stdout: true
 }
 
 keep_collapse_const_in_own_block_scope_2: {
@@ -186,6 +187,7 @@ keep_collapse_const_in_own_block_scope_2: {
             console.log(i);
         console.log(c);
     }
+    expect_stdout: true
 }
 
 evaluate: {
@@ -257,7 +259,7 @@ issue_186: {
         else
             bar();
     }
-    expect_exact: 'var x=3;if(foo())do do alert(x);while(--x)while(x)else bar();'
+    expect_exact: 'var x=3;if(foo())do{do{alert(x)}while(--x)}while(x);else bar();'
 }
 
 issue_186_ie8: {
@@ -276,7 +278,7 @@ issue_186_ie8: {
         else
             bar();
     }
-    expect_exact: 'var x=3;if(foo())do do alert(x);while(--x)while(x)else bar();'
+    expect_exact: 'var x=3;if(foo()){do{do{alert(x)}while(--x)}while(x)}else bar();'
 }
 
 issue_186_beautify: {
@@ -295,7 +297,15 @@ issue_186_beautify: {
         else
             bar();
     }
-    expect_exact: 'var x = 3;\n\nif (foo()) do do alert(x); while (--x); while (x); else bar();'
+    expect_exact: [
+        'var x = 3;',
+        '',
+        'if (foo()) do {',
+        '    do {',
+        '        alert(x);',
+        '    } while (--x);',
+        '} while (x); else bar();',
+    ]
 }
 
 issue_186_beautify_ie8: {
@@ -314,7 +324,17 @@ issue_186_beautify_ie8: {
         else
             bar();
     }
-    expect_exact: 'var x = 3;\n\nif (foo()) do do alert(x); while (--x) while (x) else bar();'
+    expect_exact: [
+        'var x = 3;',
+        '',
+        'if (foo()) {',
+        '    do {',
+        '        do {',
+        '            alert(x);',
+        '        } while (--x);',
+        '    } while (x);',
+        '} else bar();',
+    ]
 }
 
 issue_186_bracketize: {
@@ -374,7 +394,19 @@ issue_186_beautify_bracketize: {
         else
             bar();
     }
-    expect_exact: 'var x = 3;\n\nif (foo()) {\n    do {\n        do {\n            alert(x);\n        } while (--x);\n    } while (x);\n} else {\n    bar();\n}'
+    expect_exact: [
+        'var x = 3;',
+        '',
+        'if (foo()) {',
+        '    do {',
+        '        do {',
+        '            alert(x);',
+        '        } while (--x);',
+        '    } while (x);',
+        '} else {',
+        '    bar();',
+        '}',
+    ]
 }
 
 issue_186_beautify_bracketize_ie8: {
@@ -394,5 +426,17 @@ issue_186_beautify_bracketize_ie8: {
         else
             bar();
     }
-    expect_exact: 'var x = 3;\n\nif (foo()) {\n    do {\n        do {\n            alert(x);\n        } while (--x)\n    } while (x)\n} else {\n    bar();\n}'
+    expect_exact: [
+        'var x = 3;',
+        '',
+        'if (foo()) {',
+        '    do {',
+        '        do {',
+        '            alert(x);',
+        '        } while (--x);',
+        '    } while (x);',
+        '} else {',
+        '    bar();',
+        '}',
+    ]
 }

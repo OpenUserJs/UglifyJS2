@@ -286,3 +286,48 @@ fat_arrow_as_param: {
     }
     expect_exact: "foo(x=>x);foo(x=>x,y=>y);foo(x=>(x,x));foo(x=>(x,x),y=>(y,y));"
 }
+
+default_assign: {
+    options = {
+        keep_fargs: false,
+        unused: true,
+    }
+    input: {
+        function f(a, b = 3) {
+            console.log(a);
+        }
+    }
+    expect: {
+        function f(a) {
+            console.log(a);
+        }
+    }
+}
+
+expansion: {
+    options = {
+        keep_fargs: false,
+        unused: true,
+    }
+    input: {
+        function f(a, ...b) {
+            console.log(a);
+        }
+    }
+    expect: {
+        function f(a) {
+            console.log(a);
+        }
+    }
+}
+
+issue_1613: {
+  mangle = { toplevel: true };
+  input: {
+    const name = 1;
+    const foo = {
+      name
+    };
+  }
+  expect_exact: "const n=1;const c={name:n};"
+}

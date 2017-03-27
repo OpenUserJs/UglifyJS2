@@ -58,6 +58,7 @@ reduce_vars: {
         })();
         console.log(2);
     }
+    expect_stdout: true
 }
 
 modified: {
@@ -166,7 +167,7 @@ modified: {
             console.log(A ? 'yes' : 'no');
             console.log(B ? 'yes' : 'no');
         }
-   }
+    }
 }
 
 unsafe_evaluate: {
@@ -401,6 +402,7 @@ iife: {
             console.log(0, 1 * b, 5);
         }(1, 2, 3);
     }
+    expect_stdout: true
 }
 
 iife_new: {
@@ -420,6 +422,7 @@ iife_new: {
             console.log(0, 1 * b, 5);
         }(1, 2, 3);
     }
+    expect_stdout: true
 }
 
 multi_def: {
@@ -707,6 +710,7 @@ toplevel_on: {
     expect: {
         console.log(3);
     }
+    expect_stdout: true
 }
 
 toplevel_off: {
@@ -724,6 +728,7 @@ toplevel_off: {
         var x = 3;
         console.log(x);
     }
+    expect_stdout: true
 }
 
 toplevel_on_loops_1: {
@@ -751,6 +756,7 @@ toplevel_on_loops_1: {
             })();
         while (x);
     }
+    expect_stdout: true
 }
 
 toplevel_off_loops_1: {
@@ -779,6 +785,7 @@ toplevel_off_loops_1: {
             bar();
         while (x);
     }
+    expect_stdout: true
 }
 
 toplevel_on_loops_2: {
@@ -1120,5 +1127,240 @@ defun_label: {
                 }
             }(2));
         }();
+    }
+    expect_stdout: true
+}
+
+double_reference: {
+    options = {
+        reduce_vars: true,
+        unused: true,
+    }
+    input: {
+        function f() {
+            var g = function g() {
+                g();
+            };
+            g();
+        }
+    }
+    expect: {
+        function f() {
+            (function g() {
+                g();
+            })();
+        }
+    }
+}
+
+iife_arguments_1: {
+    options = {
+        reduce_vars: true,
+        unused: true,
+    }
+    input: {
+        (function(x) {
+            console.log(x() === arguments[0]);
+        })(function f() {
+            return f;
+        });
+    }
+    expect: {
+        (function(x) {
+            console.log(x() === arguments[0]);
+        })(function f() {
+            return f;
+        });
+    }
+    expect_stdout: true
+}
+
+iife_arguments_2: {
+    options = {
+        reduce_vars: true,
+        unused: true,
+    }
+    input: {
+        (function() {
+            var x = function f() {
+                return f;
+            };
+            console.log(x() === arguments[0]);
+        })();
+    }
+    expect: {
+        (function() {
+            console.log(function f() {
+                return f;
+            }() === arguments[0]);
+        })();
+    }
+    expect_stdout: true
+}
+
+iife_eval_1: {
+    options = {
+        reduce_vars: true,
+        unused: true,
+    }
+    input: {
+        (function(x) {
+            console.log(x() === eval("x"));
+        })(function f() {
+            return f;
+        });
+    }
+    expect: {
+        (function(x) {
+            console.log(x() === eval("x"));
+        })(function f() {
+            return f;
+        });
+    }
+    expect_stdout: true
+}
+
+iife_eval_2: {
+    options = {
+        reduce_vars: true,
+        unused: true,
+    }
+    input: {
+        (function() {
+            var x = function f() {
+                return f;
+            };
+            console.log(x() === eval("x"));
+        })();
+    }
+    expect: {
+        (function() {
+            var x = function f() {
+                return f;
+            };
+            console.log(x() === eval("x"));
+        })();
+    }
+    expect_stdout: true
+}
+
+iife_func_side_effects: {
+    options = {
+        reduce_vars: true,
+        unused: true,
+    }
+    input: {
+        (function(a, b, c) {
+            return b();
+        })(x(), function() {
+            return y();
+        }, z());
+    }
+    expect: {
+        (function(a, b, c) {
+            return function() {
+                return y();
+            }();
+        })(x(), 0, z());
+    }
+}
+
+issue_1595_1: {
+    options = {
+        evaluate: true,
+        reduce_vars: true,
+        unused: true,
+    }
+    input: {
+        (function f(a) {
+            return f(a + 1);
+        })(2);
+    }
+    expect: {
+        (function f(a) {
+            return f(a + 1);
+        })(2);
+    }
+}
+
+issue_1595_2: {
+    options = {
+        evaluate: true,
+        reduce_vars: true,
+        unused: true,
+    }
+    input: {
+        (function f(a) {
+            return g(a + 1);
+        })(2);
+    }
+    expect: {
+        (function(a) {
+            return g(a + 1);
+        })(2);
+    }
+}
+
+issue_1595_3: {
+    options = {
+        evaluate: true,
+        passes: 2,
+        reduce_vars: true,
+        unused: true,
+    }
+    input: {
+        (function f(a) {
+            return g(a + 1);
+        })(2);
+    }
+    expect: {
+        (function(a) {
+            return g(3);
+        })();
+    }
+}
+
+issue_1595_4: {
+    options = {
+        evaluate: true,
+        reduce_vars: true,
+        unused: true,
+    }
+    input: {
+        (function iife(a, b, c) {
+            console.log(a, b, c);
+            if (a) iife(a - 1, b, c);
+        })(3, 4, 5);
+    }
+    expect: {
+        (function iife(a, b, c) {
+            console.log(a, b, c);
+            if (a) iife(a - 1, b, c);
+        })(3, 4, 5);
+    }
+    expect_stdout: true
+}
+
+issue_1606: {
+    options = {
+        evaluate: true,
+        hoist_vars: true,
+        reduce_vars: true,
+    }
+    input: {
+        function f() {
+            var a;
+            function g(){};
+            var b = 2;
+            x(b);
+        }
+    }
+    expect: {
+        function f() {
+            var a, b;
+            function g(){};
+            b = 2;
+            x(b);
+        }
     }
 }

@@ -10,8 +10,10 @@ There's also an
 [in-browser online demo](http://lisperator.net/uglifyjs/#demo) (for Firefox,
 Chrome and probably Safari).
 
-Note: release versions of `uglify-js` only support ECMAScript 5 (ES5). If you wish to minify
+#### Note:
+- release versions of `uglify-js` only support ECMAScript 5 (ES5). If you wish to minify
 ES2015+ (ES6+) code then please use the [harmony](#harmony) development branch.
+- Node 7 has a known performance regression and runs `uglify-js` twice as slow.
 
 Install
 -------
@@ -68,7 +70,8 @@ The available options are:
   --source-map-inline           Write base64-encoded source map to the end of js output.
   --in-source-map               Input source map, useful if you're compressing
                                 JS that was generated from some other original
-                                code.
+                                code. Specify "inline" if the source map is included
+                                inline with the sources.
   --screw-ie8                   Use this flag if you don't wish to support
                                 Internet Explorer 6/7/8.
                                 By default UglifyJS will not try to be IE-proof.
@@ -200,9 +203,10 @@ compressed JS by mapping every token in the compiled JS to its original
 location.
 
 To use this feature you need to pass `--in-source-map
-/path/to/input/source.map`.  Normally the input source map should also point
-to the file containing the generated JS, so if that's correct you can omit
-input files from the command line.
+/path/to/input/source.map` or `--in-source-map inline` if the source map is
+included inline with the sources. Normally the input source map should also
+point to the file containing the generated JS, so if that's correct you can
+omit input files from the command line.
 
 ## Mangler options
 
@@ -391,11 +395,11 @@ to set `true`; it's effectively a shortcut for `foo=true`).
 - `cascade` -- small optimization for sequences, transform `x, x` into `x`
   and `x = something(), x` into `x = something()`
 
-- `collapse_vars` -- default `false`. Collapse single-use `var` and `const`
-  definitions when possible.
+- `collapse_vars` -- Collapse single-use `var` and `const` definitions
+  when possible.
 
-- `reduce_vars` -- default `false`. Improve optimization on variables assigned
-  with and used as constant values.
+- `reduce_vars` -- Improve optimization on variables assigned with and
+  used as constant values.
 
 - `warnings` -- display warnings when dropping unreachable code or unused
   declarations etc.
