@@ -196,8 +196,8 @@ negative_zero: {
         console.log(
             -0,
             0,
-            1 / (-0),
-            1 / (-0)
+            -1/0,
+            -1/0
         );
     }
     expect_stdout: true
@@ -217,8 +217,8 @@ positive_zero: {
         console.log(
             0,
             -0,
-            1 / (0),
-            1 / (0)
+            1/0,
+            1/0
         );
     }
     expect_stdout: true
@@ -306,11 +306,11 @@ pow_with_number_constants: {
         var b = 1;
         var c = 1;
         var d = NaN;
-        var e = Infinity;
+        var e = 1/0;
         var f = 0;
         var g = NaN;
-        var h = Infinity;
-        var i = -Infinity;
+        var h = 1/0;
+        var i = -1/0;
         var j = .125;
         var k = .125;
         var l = .25;
@@ -882,4 +882,72 @@ unsafe_charAt_noop: {
             "string".charAt(x)
         );
     }
+}
+
+issue_1649: {
+    options = {
+        evaluate: true,
+    }
+    input: {
+        console.log(-1 + -1);
+    }
+    expect: {
+        console.log(-2);
+    }
+    expect_stdout: "-2";
+}
+
+issue_1760_1: {
+    options = {
+        evaluate: true,
+    }
+    input: {
+        !function(a) {
+            try {
+                throw 0;
+            } catch (NaN) {
+                a = +"foo";
+            }
+            console.log(a);
+        }();
+    }
+    expect: {
+        !function(a) {
+            try {
+                throw 0;
+            } catch (NaN) {
+                a = 0 / 0;
+            }
+            console.log(a);
+        }();
+    }
+    expect_stdout: "NaN"
+}
+
+issue_1760_2: {
+    options = {
+        evaluate: true,
+        keep_infinity: true,
+    }
+    input: {
+        !function(a) {
+            try {
+                throw 0;
+            } catch (Infinity) {
+                a = 123456789 / 0;
+            }
+            console.log(a);
+        }();
+    }
+    expect: {
+        !function(a) {
+            try {
+                throw 0;
+            } catch (Infinity) {
+                a = 1 / 0;
+            }
+            console.log(a);
+        }();
+    }
+    expect_stdout: "Infinity"
 }

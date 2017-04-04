@@ -26,7 +26,7 @@ pow_with_number_constants: {
         var c = 42 ** -0;
         var d = NaN ** 1;
         var e = 2 ** (1/0);
-        var f = 2 ** -(1/0);
+        var f = 2 ** (-1/0);
     }
 }
 

@@ -153,3 +153,52 @@ evaluate_4: {
         );
     }
 }
+
+issue_1710: {
+    options = {
+        evaluate: true,
+    }
+    input: {
+        var x = {};
+        console.log((x += 1) + -x);
+    }
+    expect: {
+        var x = {};
+        console.log((x += 1) + -x);
+    }
+    expect_stdout: true
+}
+
+unary_binary_parenthesis: {
+    input: {
+        var v = [ 0, 1, NaN, Infinity, null, undefined, true, false, "", "foo", /foo/ ];
+        v.forEach(function(x) {
+            v.forEach(function(y) {
+                console.log(
+                    +(x*y),
+                    +(x/y),
+                    +(x%y),
+                    -(x*y),
+                    -(x/y),
+                    -(x%y)
+                );
+            });
+        });
+    }
+    expect: {
+        var v = [ 0, 1, NaN, 1/0, null, void 0, true, false, "", "foo", /foo/ ];
+        v.forEach(function(x) {
+            v.forEach(function(y) {
+                console.log(
+                    +x*y,
+                    +x/y,
+                    +x%y,
+                    -x*y,
+                    -x/y,
+                    -x%y
+                );
+            });
+        });
+    }
+    expect_stdout: true
+}

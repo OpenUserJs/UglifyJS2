@@ -152,6 +152,13 @@ class_methods_and_getters_with_keep_quoted_props_enabled: {
     expect_exact: 'class clss{a(){}"b"(){}get c(){return"c"}get"d"(){return"d"}set e(a){doSomething(a)}set\'f\'(a){doSomething(b)}static g(){}static"h"(){}}'
 }
 
+classes_with_expression_as_expand: {
+    input: {
+        class D extends (calls++, C) {}
+    }
+    expect_exact: "class D extends(calls++,C){}"
+}
+
 new_target: {
     input: {
         new.target;
@@ -184,7 +191,15 @@ import_statement: {
         import Bar, { Foo } from 'lel';
         import { Bar as kex, Baz as food } from 'lel';
     }
-    expect_exact: "import\"mod-name\";import Foo from\"bar\";import{Bar,Baz}from\"lel\";import Bar,{Foo}from\"lel\";import{Bar as kex,Baz as food}from\"lel\";"
+    expect_exact: 'import"mod-name";import Foo from"bar";import{Bar,Baz}from"lel";import Bar,{Foo}from"lel";import{Bar as kex,Baz as food}from"lel";'
+}
+
+import_all_statement: {
+    input: {
+        import * from 'lel';
+        import * as Lel from 'lel';
+    }
+    expect_exact: 'import*from"lel";import*as Lel from"lel";'
 }
 
 export_statement: {
@@ -197,6 +212,16 @@ export_statement: {
         export class foo { };
     }
     expect_exact: "export default 1;export var foo=4;export let foo=6;export const foo=6;export function foo(){};export class foo{};"
+}
+
+export_module_statement: {
+    input: {
+        export * from "a.js";
+        export {A} from "a.js";
+        export {A, B} from "a.js";
+        export {C};
+    }
+    expect_exact: 'export*from"a.js";export{A}from"a.js";export{A,B}from"a.js";export{C};'
 }
 
 import_statement_mangling: {
@@ -296,11 +321,25 @@ default_assign: {
         function f(a, b = 3) {
             console.log(a);
         }
+
+        g = ([[] = 123]) => {};
+        h = ([[x, y, z] = [4, 5, 6]] = []) => {};
+
+        function i([[x, y, z] = [4, 5, 6]] = []) {
+            console.log(b);
+        };
     }
     expect: {
         function f(a) {
             console.log(a);
         }
+
+        g = ([[] = 123]) => {};
+        h = ([[x, y, z] = [4, 5, 6]] = []) => {};
+
+        function i([[x, y, z] = [4, 5, 6]] = []) {
+            console.log(b);
+        };
     }
 }
 
